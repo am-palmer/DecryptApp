@@ -1,6 +1,7 @@
 package com.example.decryptapp
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -41,7 +42,54 @@ class MainActivity : AppCompatActivity() {
         //indexOfCoincidence(lordeLyrics, 2)
         //decryptCaesar(caesarTest2, 22)
         val caesar = CaesarCypher();
-        caesar.decrypt(caesarTest2, null, true, applicationContext)
+        //caesar.decrypt(caesarTest2, null, true, applicationContext)
+
+        val rsa = RSA()
+        val result = rsa.extGCD(13, 11)
+        Log.d(
+            "Main",
+            "result for extGCD(13,11): triple ${result.first}, ${result.second}, ${result.third}"
+        )
+
+    }
+
+    class RSA {
+
+        // todo: generalize
+        private val m: Int = 0
+
+        // returns triple d, a, b where d = gcd(p, q), ap + bq = d. ie. Multiplic. inverse of p and q.
+        fun extGCD(p: Int, q: Int): Triple<Int, Int, Int> {
+            if (q == 0) {
+                return Triple(p, 1, 0)
+            }
+
+            val result = extGCD(q, p % q)
+            return Triple(result.first, result.third, (result.second) - (p / q) * result.third)
+        }
+
+
+        // todo ?
+        fun modInverse(a: Int, b: Int): Int {
+            val result = extGCD(a, b)
+            val gcd = result.first
+            var x = result.second
+            var y = result.third
+            if (x < 0) {
+                x += m
+            }
+
+            return x
+        }
+
+        fun encrypt(e: Int, N: Int, msg: String) {
+
+        }
+
+        fun decrypt() {
+
+        }
+
     }
 
 }
