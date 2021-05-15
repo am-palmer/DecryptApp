@@ -1,10 +1,14 @@
 package com.example.decryptapp
 
+import android.content.Context
 import android.util.Log
 
 class CryptoUtil {
 
     private final val icTAG = "indexOfCoincidence"
+
+    //val manager = assets
+    //private lateinit var englishDictionary: InputStream
 
     // Calculates the I.C. as a Double for the given str. Groupsize is 2 by default
     fun indexOfCoincidence(str: String, groupSize: Int? = 2): Double {
@@ -37,6 +41,28 @@ class CryptoUtil {
         result = totalRepeats.toDouble() / maxRepeats.toDouble()
         Log.d("I.O.C", "I.O.C. result: $result")
         return result
+    }
+
+    // Check how many of the words in the input string are in the top 10,000 english words
+    // Note: extremely expensive for large input, don't use it with big input strings
+    fun countEnglishWords(str: String, c: Context): Int {
+        // reader
+        val englishDictionary = c.assets.open("10k.txt") // init dictionary
+        val reader = englishDictionary.bufferedReader()
+        val dictionary = reader.readLines()
+        // todo: optimize, very expensive
+        var count = 0
+        val words = str.split(" ")
+        for (word in words) {
+            for (entry in dictionary) {
+                if (word == entry && word.length > 2) {
+                    count++
+                }
+            }
+        }
+        reader.close()
+        englishDictionary.close()
+        return count
     }
 
 
