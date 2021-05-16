@@ -43,7 +43,8 @@ class MainActivity : AppCompatActivity() {
         //indexOfCoincidence(lordeLyrics, 2)
         //decryptCaesar(caesarTest2, 22)
         val caesar = CaesarCypher();
-        //caesar.decrypt(caesarTest2, null, true, applicationContext)
+        //caesar.bruteForce(caesarTest2, true, applicationContext)
+        caesar.encrypt("Pack my box with five dozen liquor jugs", 22) // Expected: lwyg iu xkt sepd bera zkvaj hemqkn fqco
 
         val rsa = RSA()
         val result = rsa.extGCD(13, 11)
@@ -53,9 +54,9 @@ class MainActivity : AppCompatActivity() {
         )
 
         //Log.d("Main", "result of mod exp. with base=11, exp=13, mod=17: ${rsa.modExp(11, 13, 17)} (expected: 7)")
-        rsa.modExp(11,13,17)
-        rsa.modExp(11,20,17)
-        rsa.modExp(6,20,7)
+        //rsa.modExp(11,13,17)
+        //rsa.modExp(11,20,17)
+        //rsa.modExp(6,20,7)
 
     }
 
