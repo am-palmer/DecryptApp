@@ -12,7 +12,7 @@ import java.math.BigInteger
 
 class MainActivity : AppCompatActivity() {
 
-//    val asset = assets
+    private val tag = "Main"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +61,8 @@ class MainActivity : AppCompatActivity() {
 
     class RSA {
 
+        private val tag = "RSA"
+
         // todo: generalize
         //// Modulo m
         //private val m: Int = 0
@@ -91,7 +93,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        // todo test
         // Fast modular exponentiation using the right-to-left binary method. See https://en.wikipedia.org/wiki/Modular_exponentiation#Right-to-left_binary_method
         fun modExp(base: Int, exp: Int, m: Int): Int {
             if (m == 1) {
