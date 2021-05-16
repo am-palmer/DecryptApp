@@ -8,6 +8,7 @@ import com.google.android.material.tabs.TabLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
 import com.example.decryptapp.ui.main.SectionsPagerAdapter
+import java.math.BigInteger
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,39 +52,77 @@ class MainActivity : AppCompatActivity() {
             "result for extGCD(13,11): triple ${result.first}, ${result.second}, ${result.third}"
         )
 
+        //Log.d("Main", "result of mod exp. with base=11, exp=13, mod=17: ${rsa.modExp(11, 13, 17)} (expected: 7)")
+        rsa.modExp(11,13,17)
+        rsa.modExp(11,20,17)
+        rsa.modExp(6,20,7)
+
     }
 
     class RSA {
 
         // todo: generalize
-        private val m: Int = 0
+        //// Modulo m
+        //private val m: Int = 0
 
-        // returns triple d, a, b where d = gcd(p, q), ap + bq = d. ie. Multiplic. inverse of p and q.
+        // Returns triple (d, x, y) where d = gcd(p, q), x(p) + y(q) = d. I.e x, y, --> Multiplicative. inverse of p and q.
+        // todo: may be less expensive to return array
         fun extGCD(p: Int, q: Int): Triple<Int, Int, Int> {
             if (q == 0) {
                 return Triple(p, 1, 0)
             }
-
             val result = extGCD(q, p % q)
             return Triple(result.first, result.third, (result.second) - (p / q) * result.third)
         }
 
 
-        // todo ?
-        fun modInverse(a: Int, b: Int): Int {
+        // Returns modular multiplicative inverse x where (a)x congruent 1 (mod m)
+        fun modInverse(a: Int, b: Int, m: Int): Int {
             val result = extGCD(a, b)
             val gcd = result.first
             var x = result.second
             var y = result.third
-            if (x < 0) {
+            // Ensure x is in positive modular range
+            while (x < 0) {
                 x += m
             }
 
             return x
         }
 
-        fun encrypt(e: Int, N: Int, msg: String) {
 
+        // todo test
+        // Fast modular exponentiation using the right-to-left binary method. See https://en.wikipedia.org/wiki/Modular_exponentiation#Right-to-left_binary_method
+        fun modExp(base: Int, exp: Int, m: Int): Int {
+            if (m == 1) {
+                return 0
+            }
+            //assert((m -1 ) * (m - 1) < Integer.MIN_VALUE)
+
+            var result = 1
+            var base = base % m
+            var exp = exp
+            while (exp > 0) {
+                if ((exp % 2) == 1) {
+                    result = (result * base) % m
+                }
+                // Signed shift right (equivalent to java's >>)
+                exp = exp shr (1)
+                base = (base * base) % m
+            }
+            Log.d("RSA.modExp", "modExp(base=$base, exp=$exp, m=$m)=$result")
+            return result
+        }
+
+        // Iterate though the String msg, getting the ordinance value and raising to power e mod n
+        fun encrypt(e: Int, N: Int, msg: String): String {
+            var cypherText = ""
+//          todo: code
+//            for (char in msg) {
+//                val m = ord(charar)
+//                cypher += String(BigInteger.)
+//            }
+        return cypherText
         }
 
         fun decrypt() {
