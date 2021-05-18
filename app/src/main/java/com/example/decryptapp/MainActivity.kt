@@ -43,10 +43,10 @@ class MainActivity : AppCompatActivity() {
         //decryptCaesar(caesarTest2, 22)
         val caesar = CaesarCypher();
         //caesar.bruteForce(caesarTest2, true, applicationContext)
-        caesar.encrypt(
-            "Pack my box with five dozen liquor jugs",
-            22
-        ) // Expected: lwyg iu xkt sepd bera zkvaj hemqkn fqco
+//        caesar.encrypt(
+//            "Pack my box with five dozen liquor jugs",
+//            22
+//        ) // Expected: lwyg iu xkt sepd bera zkvaj hemqkn fqco
 
         val rsa = RSA()
         //val result = rsa.extGCD(13, 11)
@@ -60,11 +60,19 @@ class MainActivity : AppCompatActivity() {
         //rsa.modExp(11,20,17)
         //rsa.modExp(6,20,7)
 
-        rsa.modInverse(13,  17)
-        rsa.modInverse(11,  21)
+        //rsa.modInverse(13, 17)
+        //rsa.modInverse(11, 21)
 
         //rsa.extGCD(13, 11) // Expected: gcd 1, MI 13 = -5, MI 11 = 6.
 
+        // p = 11
+        // q = 13
+        // N = pq = 143
+        // r (phi) = (p-1)(q-1) = 120
+        // private key (e, N) = (7, 143)
+        // public key (d, N) = (223, 143)
+        val cypher = rsa.encrypt(7, 143, "hello world")
+        val plaintext = rsa.decrypt(223, 143, cypher)
 
     }
 
@@ -78,7 +86,8 @@ class MainActivity : AppCompatActivity() {
                 return Triple(a, 1, 0)
             }
             val result = extGCD(b, (a % b))
-            val triple =  Triple(result.first, result.third, (result.second) - (a / b) * result.third)
+            val triple =
+                Triple(result.first, result.third, (result.second) - (a / b) * result.third)
             Log.d(
                 "$tag.extGCD",
                 "Extended GCD of $a, $b: GCD=${triple.first}, ($a)^-1=${triple.second}, ($b)^-1=${triple.third}"
@@ -86,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             return triple
         }
 
-        // Returns modular multiplicative inverse x where (a)x congruent 1 (mod m)
+        // Returns modular multiplicative inverse x where (a)x congruent 1 (mod m). Won't work if the numbers aren't co-prime
         fun modInverse(a: Int, m: Int): Int {
             val result = extGCD(a, m)
             var x = result.second
@@ -102,7 +111,6 @@ class MainActivity : AppCompatActivity() {
                 return 0
             }
             //assert((m -1 ) * (m - 1) < Integer.MIN_VALUE)
-
             var result = 1
             var base = base % m
             var exp = exp
@@ -120,20 +128,24 @@ class MainActivity : AppCompatActivity() {
 
         // Iterate though the String msg, getting the ordinance value and raising to power e mod n
         fun encrypt(e: Int, N: Int, msg: String): String {
-            var cypherText = ""
-//          todo: code
-//            for (char in msg) {
-//                val m = ord(char)
-//                cypher += String(BigInteger.)
-//            }
-
+            var cypher = ""
             for (c in msg) {
-
+                cypher += modExp(c.toInt(), e, N).toString() + " "
             }
-            return cypherText
+            Log.d("$tag.encrypt", "$msg encrypted to [$cypher]")
+            return cypher
         }
 
-        fun decrypt() {
+        fun decrypt(d: Int, N: Int, cypher: String) {
+            var plaintext = ""
+
+            val input = cypher.split(" ")
+            for (str in input) {
+                if (str.isNotEmpty()) {
+                    val c = str.toInt()
+                    plaintext += (modExp(c, d, N)).toChar()
+                }
+            }
 
         }
 
