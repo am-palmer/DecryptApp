@@ -136,17 +136,19 @@ class MainActivity : AppCompatActivity() {
             return cypher
         }
 
+        // Decrypts a given string of numbers separated by whitespace into ascii plaintext
         fun decrypt(d: Int, N: Int, cypher: String) {
             var plaintext = ""
 
+            // Split on whitespace
             val input = cypher.split(" ")
-            for (str in input) {
-                if (str.isNotEmpty()) {
-                    val c = str.toInt()
+            for (x in input) {
+                if (x.isNotEmpty()) {
+                    val c = x.toInt()
                     plaintext += (modExp(c, d, N)).toChar()
                 }
             }
-
+            Log.d("$tag.decrypt", "[$cypher] decrypted to \"$plaintext\"")
         }
 
     }
