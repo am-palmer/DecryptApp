@@ -8,7 +8,6 @@ import com.google.android.material.tabs.TabLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
 import com.example.decryptapp.ui.main.SectionsPagerAdapter
-import java.math.BigInteger
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,52 +43,55 @@ class MainActivity : AppCompatActivity() {
         //decryptCaesar(caesarTest2, 22)
         val caesar = CaesarCypher();
         //caesar.bruteForce(caesarTest2, true, applicationContext)
-        caesar.encrypt("Pack my box with five dozen liquor jugs", 22) // Expected: lwyg iu xkt sepd bera zkvaj hemqkn fqco
+        caesar.encrypt(
+            "Pack my box with five dozen liquor jugs",
+            22
+        ) // Expected: lwyg iu xkt sepd bera zkvaj hemqkn fqco
 
         val rsa = RSA()
-        val result = rsa.extGCD(13, 11)
-        Log.d(
-            "Main",
-            "result for extGCD(13,11): triple ${result.first}, ${result.second}, ${result.third}"
-        )
+        //val result = rsa.extGCD(13, 11)
+//        Log.d(
+//            "Main",
+//            "result for extGCD(13,11): triple ${result.first}, ${result.second}, ${result.third}"
+//        )
 
         //Log.d("Main", "result of mod exp. with base=11, exp=13, mod=17: ${rsa.modExp(11, 13, 17)} (expected: 7)")
         //rsa.modExp(11,13,17)
         //rsa.modExp(11,20,17)
         //rsa.modExp(6,20,7)
 
+        rsa.modInverse(13,  17)
+        rsa.modInverse(11,  21)
+
+        //rsa.extGCD(13, 11) // Expected: gcd 1, MI 13 = -5, MI 11 = 6.
+
+
     }
 
-    class RSA {
+    class RSA() {
 
         private val tag = "RSA"
 
-        // todo: generalize
-        //// Modulo m
-        //private val m: Int = 0
-
-        // Returns triple (d, x, y) where d = gcd(p, q), x(p) + y(q) = d. I.e x, y, --> Multiplicative. inverse of p and q.
-        // todo: may be less expensive to return array
-        fun extGCD(p: Int, q: Int): Triple<Int, Int, Int> {
-            if (q == 0) {
-                return Triple(p, 1, 0)
+        // Returns triple (d, x, y) where d = gcd(a, b), x(a) + y(b) = d. I.e x, y, --> Multiplicative. inverse of a and b.
+        fun extGCD(a: Int, b: Int): Triple<Int, Int, Int> {
+            if (b == 0) {
+                return Triple(a, 1, 0)
             }
-            val result = extGCD(q, p % q)
-            return Triple(result.first, result.third, (result.second) - (p / q) * result.third)
+            val result = extGCD(b, (a % b))
+            val triple =  Triple(result.first, result.third, (result.second) - (a / b) * result.third)
+            Log.d(
+                "$tag.extGCD",
+                "Extended GCD of $a, $b: GCD=${triple.first}, ($a)^-1=${triple.second}, ($b)^-1=${triple.third}"
+            )
+            return triple
         }
 
-
         // Returns modular multiplicative inverse x where (a)x congruent 1 (mod m)
-        fun modInverse(a: Int, b: Int, m: Int): Int {
-            val result = extGCD(a, b)
-            val gcd = result.first
+        fun modInverse(a: Int, m: Int): Int {
+            val result = extGCD(a, m)
             var x = result.second
-            var y = result.third
-            // Ensure x is in positive modular range
-            while (x < 0) {
-                x += m
-            }
-
+            x = (x % m + m) % m
+            Log.d("$tag.modInverse", "Modular inverse of $a (mod $m): $x")
             return x
         }
 
@@ -121,10 +123,14 @@ class MainActivity : AppCompatActivity() {
             var cypherText = ""
 //          todo: code
 //            for (char in msg) {
-//                val m = ord(charar)
+//                val m = ord(char)
 //                cypher += String(BigInteger.)
 //            }
-        return cypherText
+
+            for (c in msg) {
+
+            }
+            return cypherText
         }
 
         fun decrypt() {
