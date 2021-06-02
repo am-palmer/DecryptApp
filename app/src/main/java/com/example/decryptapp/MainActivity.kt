@@ -7,7 +7,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.math.MathUtils
 import com.example.decryptapp.ui.main.SectionsPagerAdapter
+import java.math.BigInteger
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         //rsa.modInverse(13, 17)
         //rsa.modInverse(11, 21)
 
-        //rsa.extGCD(13, 11) // Expected: gcd 1, MI 13 = -5, MI 11 = 6.
+        rsa.extGCD(13, 11) // Expected: gcd 1, MI 13 = -5, MI 11 = 6.
 
         // p = 11
         // q = 13
@@ -73,83 +77,6 @@ class MainActivity : AppCompatActivity() {
         // public key (d, N) = (223, 143)
         val cypher = rsa.encrypt(7, 143, "hello world")
         val plaintext = rsa.decrypt(223, 143, cypher)
-
-    }
-
-    class RSA() {
-
-        private val tag = "RSA"
-
-        // Returns triple (d, x, y) where d = gcd(a, b), x(a) + y(b) = d. I.e x, y, --> Multiplicative. inverse of a and b.
-        fun extGCD(a: Int, b: Int): Triple<Int, Int, Int> {
-            if (b == 0) {
-                return Triple(a, 1, 0)
-            }
-            val result = extGCD(b, (a % b))
-            val triple =
-                Triple(result.first, result.third, (result.second) - (a / b) * result.third)
-            Log.d(
-                "$tag.extGCD",
-                "Extended GCD of $a, $b: GCD=${triple.first}, ($a)^-1=${triple.second}, ($b)^-1=${triple.third}"
-            )
-            return triple
-        }
-
-        // Returns modular multiplicative inverse x where (a)x congruent 1 (mod m). Won't work if the numbers aren't co-prime
-        fun modInverse(a: Int, m: Int): Int {
-            val result = extGCD(a, m)
-            var x = result.second
-            x = (x % m + m) % m
-            Log.d("$tag.modInverse", "Modular inverse of $a (mod $m): $x")
-            return x
-        }
-
-
-        // Fast modular exponentiation using the right-to-left binary method. See https://en.wikipedia.org/wiki/Modular_exponentiation#Right-to-left_binary_method
-        fun modExp(base: Int, exp: Int, m: Int): Int {
-            if (m == 1) {
-                return 0
-            }
-            //assert((m -1 ) * (m - 1) < Integer.MIN_VALUE)
-            var result = 1
-            var base = base % m
-            var exp = exp
-            while (exp > 0) {
-                if ((exp % 2) == 1) {
-                    result = (result * base) % m
-                }
-                // Signed shift right (equivalent to java's >>)
-                exp = exp shr (1)
-                base = (base * base) % m
-            }
-            Log.d("RSA.modExp", "modExp(base=$base, exp=$exp, m=$m)=$result")
-            return result
-        }
-
-        // Iterate though the String msg, getting the ordinance value and raising to power e mod n
-        fun encrypt(e: Int, N: Int, msg: String): String {
-            var cypher = ""
-            for (c in msg) {
-                cypher += modExp(c.toInt(), e, N).toString() + " "
-            }
-            Log.d("$tag.encrypt", "$msg encrypted to [$cypher]")
-            return cypher
-        }
-
-        // Decrypts a given string of numbers separated by whitespace into ascii plaintext
-        fun decrypt(d: Int, N: Int, cypher: String) {
-            var plaintext = ""
-
-            // Split on whitespace
-            val input = cypher.split(" ")
-            for (x in input) {
-                if (x.isNotEmpty()) {
-                    val c = x.toInt()
-                    plaintext += (modExp(c, d, N)).toChar()
-                }
-            }
-            Log.d("$tag.decrypt", "[$cypher] decrypted to \"$plaintext\"")
-        }
 
     }
 
