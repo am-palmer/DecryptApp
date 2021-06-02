@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/editTextCyphertext"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="cyphertext"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_min="200dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextShift" />
+
+    <EditText
+        android:id="@+id/editTextMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="message"
+        android:inputType="text"
+        app:layout_constraintHeight_min="200dp"
+        app:layout_constraintStart_toStartOf="@+id/editTextCyphertext"
+        app:layout_constraintTop_toBottomOf="@+id/editTextCyphertext" />
+
+    <ImageButton
+        android:id="@+id/imageButtonDecrypt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="TODO"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextCyphertext"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editTextCyphertext"
+        app:srcCompat="@drawable/ic_baseline_lock_open_24_purple" />
+
+    <ImageButton
+        android:id="@+id/imageButtonEncrypt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="TODO"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editTextMessage"
+        app:srcCompat="@drawable/ic_baseline_lock_24_purple" />
+
+
+    <EditText
+        android:id="@+id/editTextShift"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="shift (optional)"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/imageViewShiftIcon"
+        app:layout_constraintTop_toBottomOf="@+id/textViewDescriptionCaesar" />
+
+    <ImageView
+        android:id="@+id/imageViewShiftIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextShift"
+        app:layout_constraintEnd_toEndOf="@+id/editTextCyphertext"
+        app:layout_constraintHorizontal_bias="0.16"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editTextShift"
+        app:srcCompat="@drawable/ic_baseline_vpn_key_24" />
+
+    <TextView
+        android:id="@+id/textViewDescriptionCaesar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="The caesar cypher is a basic substitution cypher in which letters in the message are rotated by a fixed shift value across the alphabet."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
