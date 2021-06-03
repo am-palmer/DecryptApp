@@ -13,9 +13,9 @@
         android:ems="10"
         android:gravity="top"
         android:hint="cyphertext"
-        android:inputType="text"
+        android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_min="200dp"
+        app:layout_constraintHeight_min="100dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextShift" />
 
@@ -27,8 +27,8 @@
         android:ems="10"
         android:gravity="top"
         android:hint="message"
-        android:inputType="text"
-        app:layout_constraintHeight_min="200dp"
+        android:inputType="textMultiLine"
+        app:layout_constraintHeight_min="100dp"
         app:layout_constraintStart_toStartOf="@+id/editTextCyphertext"
         app:layout_constraintTop_toBottomOf="@+id/editTextCyphertext" />
 
