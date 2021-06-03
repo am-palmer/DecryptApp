@@ -33,20 +33,20 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextCyphertext" />
 
     <ImageButton
-        android:id="@+id/imageButtonDecrypt"
+        android:id="@+id/imageButtonDecryptCaesar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="TODO"
+        android:contentDescription="decrypt the cypher-text"
         app:layout_constraintBottom_toBottomOf="@+id/editTextCyphertext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/editTextCyphertext"
         app:srcCompat="@drawable/ic_baseline_lock_open_24_purple" />
 
     <ImageButton
-        android:id="@+id/imageButtonEncrypt"
+        android:id="@+id/imageButtonEncryptCaesar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="TODO"
+        android:contentDescription="encrypt the plaintext"
         app:layout_constraintBottom_toBottomOf="@+id/editTextMessage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/editTextMessage"

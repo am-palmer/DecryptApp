@@ -47,7 +47,7 @@ class CryptoUtil {
     // Note: extremely expensive for large input, don't use it with big input strings
     fun countEnglishWords(str: String, c: Context): Int {
         // reader
-        val englishDictionary = c.assets.open("10k.txt") // init dictionary
+        val englishDictionary = c.assets.open("10kEng.txt") // init dictionary
         val reader = englishDictionary.bufferedReader()
         val dictionary = reader.readLines()
         // todo: optimize, very expensive
