@@ -49,7 +49,7 @@ class CaesarCypher {
                 output += newChar
                 //Log.d("decryptCaesar", "$char is shifted -$key spaces and becomes $newChar")
             } else {
-                output += " "
+                output += char
             }
 
         }

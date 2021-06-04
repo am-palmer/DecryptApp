@@ -1,5 +1,6 @@
 package com.example.decryptapp.ui.main
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,11 +8,13 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
-import androidx.core.text.set
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.decryptapp.CaesarCypher
 import com.example.decryptapp.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Fragment for the Caesar cypher view.
@@ -21,6 +24,10 @@ class CaesarFragment : Fragment() {
     private lateinit var caesar: CaesarCypher
 
     private lateinit var pageViewModel: PageViewModel
+
+    private lateinit var messageTextView: EditText
+    private lateinit var cypherTextView: EditText
+    private lateinit var shiftKeyView: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +42,9 @@ class CaesarFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_caesar, container, false)
-        val messageTextView: EditText = root.findViewById(R.id.editTextMessage)
-        val cypherTextView: EditText = root.findViewById(R.id.editTextCyphertext)
-        val shiftKeyView: EditText = root.findViewById(R.id.editTextShift)
+        messageTextView = root.findViewById(R.id.editTextMessage)
+        cypherTextView = root.findViewById(R.id.editTextCyphertext)
+        shiftKeyView = root.findViewById(R.id.editTextShift)
         val encryptButton: ImageButton = root.findViewById(R.id.imageButtonEncryptCaesar)
 
         encryptButton.setOnClickListener {
@@ -80,6 +87,11 @@ class CaesarFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    decryptInBackground(cypherTextView.text.toString(), requireContext())
+                }
+
                 // todo: coroutine
                 // Let's not even do this
 //                if (shiftKeyView.text.isNotEmpty()) {
@@ -98,22 +110,25 @@ class CaesarFragment : Fragment() {
 //
 //                }
                 // bruteforce the shift value and message
-                val result =
-                    caesar.bruteForce(cypherTextView.text.toString(), true, requireContext())
                 // result[0] is our candidate solution. hopefully...
-                // set the result plaintext and key
-                //shiftKeyView.setText(result[0].key.toString())
-                shiftKeyView.text.clear()
-                messageTextView.setText(result[0].str)
-                Toast.makeText(requireContext(), "Decrypted likely message", Toast.LENGTH_SHORT)
-                    .show()
 
 
             }
         }
-
-
         return root
+    }
+
+    private fun decryptInBackground(text: String, context: Context) {
+        val result =
+            caesar.bruteForce(text, true, context)
+        updateUIAfterDecrypt(result[0].str)
+    }
+
+    private fun updateUIAfterDecrypt(plaintext: String) = CoroutineScope(Dispatchers.Main).launch {
+        shiftKeyView.text.clear()
+        messageTextView.setText(plaintext)
+        Toast.makeText(requireContext(), "Decrypted likely message", Toast.LENGTH_SHORT)
+            .show()
     }
 
     companion object {
