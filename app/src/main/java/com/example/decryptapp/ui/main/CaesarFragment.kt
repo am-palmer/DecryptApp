@@ -35,17 +35,12 @@ class CaesarFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_caesar, container, false)
-//        val textView: TextView = root.findViewById(R.id.section_label)
-//        pageViewModel.text.observe(this, Observer<String> {
-//            textView.text = it
-//        })
         val messageTextView: EditText = root.findViewById(R.id.editTextMessage)
         val cypherTextView: EditText = root.findViewById(R.id.editTextCyphertext)
         val shiftKeyView: EditText = root.findViewById(R.id.editTextShift)
         val encryptButton: ImageButton = root.findViewById(R.id.imageButtonEncryptCaesar)
 
         encryptButton.setOnClickListener {
-            // todo: get the value from the plaintext edittext, shift, and pass to caesar (coroutine?), then populate text boxes with result
             if (messageTextView.text.isNullOrEmpty()) {
                 Toast.makeText(
                     requireContext(),
@@ -67,13 +62,17 @@ class CaesarFragment : Fragment() {
                     Integer.parseInt(shiftKeyView.text.toString())
                 )
                 cypherTextView.setText(cypherText)
-                Toast.makeText(requireContext(), "Encrypted message", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Encrypted message using shift=${shiftKeyView.text}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                shiftKeyView.text.clear()
             }
         }
 
         val decryptButton: ImageButton = root.findViewById(R.id.imageButtonDecryptCaesar)
         decryptButton.setOnClickListener {
-            // todo: decrypt
             if (cypherTextView.text.isNullOrEmpty()) {
                 Toast.makeText(
                     requireContext(),
@@ -81,33 +80,35 @@ class CaesarFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                // todo: coroutine? maybe needed for dictionary check
-                if (shiftKeyView.text.isNotEmpty()) {
-                    // use the shift key provided
-                    // todo: use key checkbox in ui
-                    val result = caesar.decrypt(
-                        messageTextView.text.toString(),
-                        Integer.parseInt(shiftKeyView.text.toString())
-                    )
-                    messageTextView.setText(result)
-                    Toast.makeText(
-                        requireContext(),
-                        "Decrypted using shift=${shiftKeyView.text}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                // todo: coroutine
+                // Let's not even do this
+//                if (shiftKeyView.text.isNotEmpty()) {
+//                    // use the shift key provided
+//
+//                    val result = caesar.decrypt(
+//                        messageTextView.text.toString(),
+//                        Integer.parseInt(shiftKeyView.text.toString())
+//                    )
+//                    messageTextView.setText(result)
+//                    Toast.makeText(
+//                        requireContext(),
+//                        "Decrypted using shift=${shiftKeyView.text}",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//
+//                }
+                // bruteforce the shift value and message
+                val result =
+                    caesar.bruteForce(cypherTextView.text.toString(), true, requireContext())
+                // result[0] is our candidate solution. hopefully...
+                // set the result plaintext and key
+                //shiftKeyView.setText(result[0].key.toString())
+                shiftKeyView.text.clear()
+                messageTextView.setText(result[0].str)
+                Toast.makeText(requireContext(), "Decrypted likely message", Toast.LENGTH_SHORT)
+                    .show()
 
-                } else {
-                    // bruteforce the shift value and message
-                    val result =
-                        caesar.bruteForce(messageTextView.text.toString(), true, requireContext())
-                    // result[0] is our candidate solution. hopefully...
-                    // set the result plaintext and key
-                    shiftKeyView.setText(result[0].key.toString())
-                    messageTextView.setText(result[0].str)
-                    Toast.makeText(requireContext(), "Decrypted likely message", Toast.LENGTH_SHORT)
-                        .show()
 
-                }
             }
         }
 

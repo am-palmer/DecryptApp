@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
 
-        // give us a FAB if we need it.
+        // Give us a FAB if we need it.
         //val fab: FloatingActionButton = findViewById(R.id.fab)
 
         //fab.setOnClickListener { view ->
