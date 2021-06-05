@@ -4,10 +4,15 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.math.MathUtils
+import java.lang.ArithmeticException
 import java.math.BigInteger
+import kotlin.math.floor
+import kotlin.math.pow
 import kotlin.random.Random
 
 class RSA() {
+
+    // todo: if anything is seriously wrong, we might need BigIntegers instead of longs
 
     private val tag = "RSA"
 
@@ -206,7 +211,7 @@ class RSA() {
     }
 
     // Iterate though the String msg, getting the ordinance value and raising to power e mod n
-    fun encrypt(e: Int, N: Int, msg: String): String {
+    fun encrypt(e: Int, N: BigInteger, msg: String): String {
         var cypher = ""
         for (c in msg) {
             cypher += modExp(c.toLong(), e.toLong(), N.toLong()).toString() + " "
@@ -216,7 +221,7 @@ class RSA() {
     }
 
     // Decrypts a given string of numbers separated by whitespace into ascii plaintext
-    fun decrypt(d: Int, N: Int, cypher: String): String {
+    fun decrypt(d: Int, N: BigInteger, cypher: String): String {
         var plaintext = ""
 
         // Split on whitespace
@@ -231,19 +236,51 @@ class RSA() {
         return plaintext
     }
 
-    private fun iSQRT(n: Long){
-        var x = n
-        var y = (x + Math.floorDiv(n, x))
+
+//    // todo might not be needed
+//    private fun isSQRT(n: Long): BigInteger{
+//        var x = n
+//        var y = Math.floorDiv((x + Math.floorDiv(n, x)), 2L)
+//        while (y < x) {
+//            x = y
+//            y = Math.floorDiv((x + Math.floorDiv(n, x)), 2L)
+//        }
+//        return BigInteger.valueOf(x)
+//    }
+
+
+    // With reference to https://stackoverflow.com/questions/2685524/check-if-biginteger-is-not-a-perfect-square
+    private fun bigIntSQRT(N: BigInteger): BigInteger {
+        if (N <= BigInteger.valueOf(0)) {
+            throw ArithmeticException("Expected a positive number")
+        } else {
+            val bitLength = N.bitLength()
+            var root = BigInteger.ONE.shiftLeft(bitLength / 2)
+            while (!isSqrt(N, root)) {
+                root = root.add(N.divide(root).divide(BigInteger("2")))
+            }
+
+            return root
+        }
+    }
+
+    private fun isSqrt(N: BigInteger, root: BigInteger): Boolean {
+        val lowerBound = root.pow(2)
+        val upperBound = root.add(BigInteger.ONE).pow(2)
+        return lowerBound <= N && N < upperBound
     }
 
     // Returns the two factors p,q of N
-    private fun fermatFactors(N: Long): Pair<Long, Long>{
+    private fun fermatFactors(N: BigInteger): Pair<BigInteger, BigInteger> {
         // todo
-        return Pair(1L, 2L)
+        val a = isSQRT(N)
+        val z = pow(a, 2) - N
+        b =
+            return Pair(1L, 2L)
     }
 
     // Given the public key (e, N) and cyphertext, Use Fermat's factorization method to figure out the factors of N and decode the message
-    fun bruteForceFermat(e: Int, N: Int, cypher: String): String{
+    fun bruteForceFermat(e: Int, N: Int, cypher: String): String {
         var plaintext = ""
 
         return plaintext
