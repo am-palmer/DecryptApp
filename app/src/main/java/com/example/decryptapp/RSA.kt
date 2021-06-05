@@ -1,6 +1,9 @@
 package com.example.decryptapp
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.core.math.MathUtils
 import java.math.BigInteger
 import kotlin.random.Random
 
@@ -213,7 +216,7 @@ class RSA() {
     }
 
     // Decrypts a given string of numbers separated by whitespace into ascii plaintext
-    fun decrypt(d: Int, N: Int, cypher: String) {
+    fun decrypt(d: Int, N: Int, cypher: String): String {
         var plaintext = ""
 
         // Split on whitespace
@@ -225,6 +228,25 @@ class RSA() {
             }
         }
         Log.d("$tag.decrypt", "[$cypher] decrypted to \"$plaintext\"")
+        return plaintext
+    }
+
+    private fun iSQRT(n: Long){
+        var x = n
+        var y = (x + Math.floorDiv(n, x))
+    }
+
+    // Returns the two factors p,q of N
+    private fun fermatFactors(N: Long): Pair<Long, Long>{
+        // todo
+        return Pair(1L, 2L)
+    }
+
+    // Given the public key (e, N) and cyphertext, Use Fermat's factorization method to figure out the factors of N and decode the message
+    fun bruteForceFermat(e: Int, N: Int, cypher: String): String{
+        var plaintext = ""
+
+        return plaintext
     }
 
 }
