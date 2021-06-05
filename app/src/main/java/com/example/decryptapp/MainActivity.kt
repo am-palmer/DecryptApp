@@ -78,8 +78,8 @@ class MainActivity : AppCompatActivity() {
         // r (phi) = (p-1)(q-1) = 120
         // private key (e, N) = (7, 143)
         // public key (d, N) = (223, 143)
-        val cypher = rsa.encrypt(7, 143, "hello world")
-        val plaintext = rsa.decrypt(223, 143, cypher)
+        //val cypher = rsa.encrypt(7, 143, "hello world")
+        //val plaintext = rsa.decrypt(223, 143, cypher)
 
     }
 

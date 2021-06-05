@@ -1,13 +1,7 @@
 package com.example.decryptapp
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.core.math.MathUtils
-import java.lang.ArithmeticException
 import java.math.BigInteger
-import kotlin.math.floor
-import kotlin.math.pow
 import kotlin.random.Random
 
 class RSA() {
@@ -249,41 +243,68 @@ class RSA() {
 //    }
 
 
-    // With reference to https://stackoverflow.com/questions/2685524/check-if-biginteger-is-not-a-perfect-square
-    private fun bigIntSQRT(N: BigInteger): BigInteger {
+    // SQRT for BigInts
+    // todo: optimize further
+    private fun sqrt(N: BigInteger): BigInteger {
         if (N <= BigInteger.valueOf(0)) {
             throw ArithmeticException("Expected a positive number")
         } else {
-            val bitLength = N.bitLength()
-            var root = BigInteger.ONE.shiftLeft(bitLength / 2)
-            while (!isSqrt(N, root)) {
-                root = root.add(N.divide(root).divide(BigInteger("2")))
+            val two = BigInteger.valueOf(2L)
+            if (N < two) {
+                // I.e. sqrt of 0 or 1.
+                return N
             }
-
-            return root
+            var y = N.divide(two)
+            while (y.compareTo(N.divide(y)) > 0) {
+                y = N.divide(y).add(y).divide(two)
+            }
+            return if (N.compareTo(y.multiply(y)) == 0) {
+                y
+            } else {
+                y.add(BigInteger.ONE)
+            }
         }
     }
 
-    private fun isSqrt(N: BigInteger, root: BigInteger): Boolean {
-        val lowerBound = root.pow(2)
-        val upperBound = root.add(BigInteger.ONE).pow(2)
-        return lowerBound <= N && N < upperBound
+    private fun isSquare(N: BigInteger): Boolean {
+        val sqr: BigInteger = sqrt(N)
+        return sqr.multiply(sqr).equals(N) || sqr.add(BigInteger.ONE)
+            .multiply(sqr.add(BigInteger.ONE)).equals(N)
     }
 
-    // Returns the two factors p,q of N
-    private fun fermatFactors(N: BigInteger): Pair<BigInteger, BigInteger> {
-        // todo
-        val a = isSQRT(N)
-        val z = pow(a, 2) - N
-        b =
-            return Pair(1L, 2L)
+
+    // todo: optimize further if possible
+    // example: N = 105327569
+    // output expected: 10223, 10303
+    // Returns the two factors p,q of N as a Pair of BigIntegers
+    fun fermatFactors(N: BigInteger): Pair<BigInteger, BigInteger> {
+        Log.d("$tag.fermatFactors()", "Started with N = $N")
+        var a = sqrt(N)
+        if ((a.multiply(a)).equals(N)) {
+            return Pair(a, a)
+        }
+        var b = a.multiply(a).subtract(N)
+        while (!isSquare(b)) {
+            a = a.plus(BigInteger.ONE)
+            b = a.multiply(a).subtract(N)
+        }
+        val r1 = a.subtract(sqrt(b))
+        val r2 = N.divide(r1)
+
+        return Pair(r1, r2)
     }
 
+    // todo: code this
     // Given the public key (e, N) and cyphertext, Use Fermat's factorization method to figure out the factors of N and decode the message
     fun bruteForceFermat(e: Int, N: Int, cypher: String): String {
         var plaintext = ""
 
         return plaintext
+    }
+
+    // todo: use quadratic sieve to bruteforce small primes N (?)
+    fun bruteForceSieve() {
+
     }
 
 }
