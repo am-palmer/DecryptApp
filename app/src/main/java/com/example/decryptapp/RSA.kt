@@ -1,5 +1,6 @@
 package com.example.decryptapp
 
+import android.content.Context
 import android.util.Log
 import java.math.BigInteger
 import kotlin.random.Random
@@ -70,7 +71,7 @@ class RSA() {
         var e = 0L
         while (true) {
             e = Random.nextLong(start, end)
-            if (isCoprime(e, phiN)) {
+            if (isCoPrime(e, phiN)) {
                 break
             }
         }
@@ -126,7 +127,7 @@ class RSA() {
     }
 
     // True/false test for co-primality of p, q
-    private fun isCoprime(p: Long, q: Long): Boolean {
+    private fun isCoPrime(p: Long, q: Long): Boolean {
         return (gcdL(p, q) == 1L)
     }
 
@@ -242,9 +243,9 @@ class RSA() {
 //        return BigInteger.valueOf(x)
 //    }
 
-
     // SQRT for BigInts
     // todo: optimize further
+    // todo: ceiling or floor?
     private fun sqrt(N: BigInteger): BigInteger {
         if (N <= BigInteger.valueOf(0)) {
             throw ArithmeticException("Expected a positive number")
@@ -258,7 +259,7 @@ class RSA() {
             while (y.compareTo(N.divide(y)) > 0) {
                 y = N.divide(y).add(y).divide(two)
             }
-            return if (N.compareTo(y.multiply(y)) == 0) {
+            return if (N.compareTo(y.multiply(y)).equals(0)) {
                 y
             } else {
                 y.add(BigInteger.ONE)
@@ -272,10 +273,7 @@ class RSA() {
             .multiply(sqr.add(BigInteger.ONE)).equals(N)
     }
 
-
     // todo: optimize further if possible
-    // example: N = 105327569
-    // output expected: 10223, 10303
     // Returns the two factors p,q of N as a Pair of BigIntegers
     fun fermatFactors(N: BigInteger): Pair<BigInteger, BigInteger> {
         Log.d("$tag.fermatFactors()", "Started with N = $N")
@@ -294,9 +292,128 @@ class RSA() {
         return Pair(r1, r2)
     }
 
+    /**
+     * Uses a list of the first 100K primes to find the factorization of N.
+     * Value of N passed should be smaller than the largest product of the 100,000th prime squared (1299709^2 = 1689243484681).
+     */
+    // todo: this is just bad, don't use it, or optimize it somehow
+    fun bruteForceSmallKey(N: BigInteger, c: Context): Pair<Int, Int> {
+        if (N > BigInteger("1689243484681")) {
+            throw java.lang.ArithmeticException("Expected a value of N <= 1689243484681.")
+        } else {
+            // todo: we can load the primes as a list of ints, they're all smaller than MAX_VALUE. the products however are NOT, so they must be BigInts
+            val primeList =
+                c.assets.open("100kPrimes.txt") // Text file with the first 100,000 primes, one per line
+            val reader = primeList.bufferedReader()
+            // todo: awful, optimize
+            val primesString = reader.readLines()
+            var primeInts =
+                ArrayList<Int>() // Ints are fine here, largest is smaller than Integer.MAX_VALUE
+            for (str in primesString) {
+                // todo actually terrible, we don't want to do this, read them as Ints first thing if possible
+                primeInts.add(Integer.parseInt(str))
+            }
+
+            // Iterate through the list and try every combination
+            // todo: there should be a smarter way to do this depending on N, some lower bound or something. we shouldn't have to try every single combination
+            for (x in primeInts) {
+                for (y in primeInts) {
+                    val candidate = BigInteger.valueOf(x.toLong() * y)
+                    if (candidate.equals(N)) return Pair(
+                        x,
+                        y
+                    ) // When we find a match, we have found the factors p,q of N
+                }
+            }
+        }
+        Log.wtf(
+            "$tag.bruteForceSmallKey",
+            "bruteForceSmallKey() failed to find candidate. Is N the product of two primes?",
+            IllegalStateException()
+        )
+        return Pair(0, 0) // Shouldn't ever happen
+    }
+
+    /**
+     * Uses Pollard's rho algorithm to find the factors for smaller values of N. Returns Pair(p, q), or (0, 0) if it fails.
+     * Details: https://en.wikipedia.org/wiki/Pollard%27s_rho_algorithm
+     */
+    fun pollardFactorization(
+        N: BigInteger,
+        x: BigInteger
+    ): Pair<BigInteger, BigInteger> {
+        // todo: x?
+        //var loop = 1
+        //var count: BigInteger
+        //var xFixed = x
+        var xVar = BigInteger("2")
+        var yVar = BigInteger("2")
+        //var size = x
+        var factor = BigInteger.ONE
+
+        while (factor.equals(BigInteger.ONE)) {
+            // Tortoise step
+            xVar = rhoMod(xVar, N)
+
+            // Hare step
+            yVar = rhoMod(rhoMod(yVar, N), N)
+
+            // Check gcd(x - y, N). If it's not 1, we've found a factor.
+            factor = (xVar.minus(yVar)).gcd(N)
+        }
+
+//        // todo: not working correctly
+//        do {
+//            count = size
+//            do {
+//                xVar = xVar.multiply(xVar.plus(BigInteger.ONE)).divide(N)
+//                factor = (xVar.minus(xFixed)).abs().gcd(N)
+//                count.dec() // todo: does this work? here
+//            } while (factor.equals(1))
+//            size.multiply(BigInteger.valueOf(2L))
+//            xFixed = xVar
+//            loop.inc()
+//        } while (factor.equals(1))
+
+        return if (factor.equals(N)) {
+            Pair(BigInteger.ZERO, BigInteger.ZERO)
+        } else {
+            var p = factor
+            var q = N.divide(p)
+            // Make sure p is the smaller of the two factors
+            if (p > q) {
+                val temp = q
+                q = p
+                p = temp
+            }
+            Pair(p, q)
+        }
+    }
+
+    // Modulus function for Pollard's rho algorithm
+    private fun rhoMod(x: BigInteger, mod: BigInteger): BigInteger {
+        return (x.multiply(x.plus(BigInteger.ONE))).mod(mod)
+    }
+
     // todo: code this
-    // Given the public key (e, N) and cyphertext, Use Fermat's factorization method to figure out the factors of N and decode the message
-    fun bruteForceFermat(e: Int, N: Int, cypher: String): String {
+    /**
+     * Given the public key (e, N) and cypher-text = cypher, try a combination of methods to factorize N (finding p, q).
+     * From that, derive phi(N) = (p-1)(q-1), and then the modular multiplicative inverse of e = d (mod N).
+     *
+     */
+    //
+    fun bruteForce(e: Int, N: BigInteger, cypher: String, c: Context): String {
+        val maxFixedN =
+            BigInteger("1689243484681") // Used for our quick factorization for small values of N
+        var primeFactors = Pair(0, 0)
+        if (N <= maxFixedN) {
+            primeFactors = bruteForceSmallKey(N, c)
+        }
+
+        val phiN = BigInteger.valueOf(primeFactors.first.toLong() * primeFactors.second)
+
+        // todo: use phi(N) to derive M.I. of e, then use that to decrypt message
+
         var plaintext = ""
 
         return plaintext
