@@ -10,6 +10,7 @@ class CryptoUtil {
     //val manager = assets
     //private lateinit var englishDictionary: InputStream
 
+    // todo: implement this in the interface -> in the rsa portion, just so it is actually used.
     // Calculates the I.C. as a Double for the given str. Groupsize is 2 by default
     fun indexOfCoincidence(str: String, groupSize: Int? = 2): Double {
         val strFiltered = str.filter { !it.isWhitespace() }

@@ -95,7 +95,6 @@ class RSA() {
     }
 
     fun pow(n: Long, exp: Int): Long {
-        // todo test
         return BigInteger.valueOf(n).pow(exp).toLong()
     }
 
@@ -173,7 +172,6 @@ class RSA() {
         else gcdL(b, a % b)
     }
 
-
     // Returns modular multiplicative inverse x where (a)x congruent 1 (mod m). Won't work if the numbers aren't co-prime
     fun modInverse(a: Int, m: Int): Int {
         val result = extGCD(a, m)
@@ -183,9 +181,8 @@ class RSA() {
         return x
     }
 
-
     // Fast modular exponentiation using the right-to-left binary method. See https://en.wikipedia.org/wiki/Modular_exponentiation#Right-to-left_binary_method
-    fun modExp(base: Long, exp: Long, m: Long): Long {
+    private fun modExp(base: Long, exp: Long, m: Long): Long {
         if (m == 1L) {
             return 0
         }
@@ -231,18 +228,6 @@ class RSA() {
         return plaintext
     }
 
-
-//    // todo might not be needed
-//    private fun isSQRT(n: Long): BigInteger{
-//        var x = n
-//        var y = Math.floorDiv((x + Math.floorDiv(n, x)), 2L)
-//        while (y < x) {
-//            x = y
-//            y = Math.floorDiv((x + Math.floorDiv(n, x)), 2L)
-//        }
-//        return BigInteger.valueOf(x)
-//    }
-
     // SQRT for BigInts
     // todo: optimize further
     // todo: ceiling or floor?
@@ -273,7 +258,6 @@ class RSA() {
             .multiply(sqr.add(BigInteger.ONE)).equals(N)
     }
 
-    // todo: optimize further if possible
     // Returns the two factors p,q of N as a Pair of BigIntegers
     fun fermatFactors(N: BigInteger): Pair<BigInteger, BigInteger> {
         Log.d("$tag.fermatFactors()", "Started with N = $N")
@@ -295,27 +279,24 @@ class RSA() {
     /**
      * Uses a list of the first 100K primes to find the factorization of N.
      * Value of N passed should be smaller than the largest product of the 100,000th prime squared (1299709^2 = 1689243484681).
+     * TODO: This is just bad, don't use it
      */
-    // todo: this is just bad, don't use it, or optimize it somehow
     fun bruteForceSmallKey(N: BigInteger, c: Context): Pair<Int, Int> {
         if (N > BigInteger("1689243484681")) {
             throw java.lang.ArithmeticException("Expected a value of N <= 1689243484681.")
         } else {
-            // todo: we can load the primes as a list of ints, they're all smaller than MAX_VALUE. the products however are NOT, so they must be BigInts
             val primeList =
                 c.assets.open("100kPrimes.txt") // Text file with the first 100,000 primes, one per line
             val reader = primeList.bufferedReader()
-            // todo: awful, optimize
             val primesString = reader.readLines()
             var primeInts =
                 ArrayList<Int>() // Ints are fine here, largest is smaller than Integer.MAX_VALUE
             for (str in primesString) {
-                // todo actually terrible, we don't want to do this, read them as Ints first thing if possible
+                // Todo -> read them as Ints first thing
                 primeInts.add(Integer.parseInt(str))
             }
 
-            // Iterate through the list and try every combination
-            // todo: there should be a smarter way to do this depending on N, some lower bound or something. we shouldn't have to try every single combination
+            // Iterate through the list and try every combination...
             for (x in primeInts) {
                 for (y in primeInts) {
                     val candidate = BigInteger.valueOf(x.toLong() * y)
@@ -338,42 +319,25 @@ class RSA() {
      * Uses Pollard's rho algorithm to find the factors for smaller values of N. Returns Pair(p, q), or (0, 0) if it fails.
      * Details: https://en.wikipedia.org/wiki/Pollard%27s_rho_algorithm
      */
-    fun pollardFactorization(
+    fun pollardFactors(
         N: BigInteger,
         x: BigInteger
     ): Pair<BigInteger, BigInteger> {
-        // todo: x?
-        //var loop = 1
-        //var count: BigInteger
-        //var xFixed = x
+
         var xVar = BigInteger("2")
         var yVar = BigInteger("2")
-        //var size = x
         var factor = BigInteger.ONE
 
         while (factor.equals(BigInteger.ONE)) {
-            // Tortoise step
+            // "Tortoise" step
             xVar = rhoMod(xVar, N)
 
-            // Hare step
+            // "Hare" step
             yVar = rhoMod(rhoMod(yVar, N), N)
 
             // Check gcd(x - y, N). If it's not 1, we've found a factor.
             factor = (xVar.minus(yVar)).gcd(N)
         }
-
-//        // todo: not working correctly
-//        do {
-//            count = size
-//            do {
-//                xVar = xVar.multiply(xVar.plus(BigInteger.ONE)).divide(N)
-//                factor = (xVar.minus(xFixed)).abs().gcd(N)
-//                count.dec() // todo: does this work? here
-//            } while (factor.equals(1))
-//            size.multiply(BigInteger.valueOf(2L))
-//            xFixed = xVar
-//            loop.inc()
-//        } while (factor.equals(1))
 
         return if (factor.equals(N)) {
             Pair(BigInteger.ZERO, BigInteger.ZERO)
@@ -395,33 +359,43 @@ class RSA() {
         return (x.multiply(x.plus(BigInteger.ONE))).mod(mod)
     }
 
-    // todo: code this
+    // todo: finish this and test it
     /**
-     * Given the public key (e, N) and cypher-text = cypher, try a combination of methods to factorize N (finding p, q).
+     * Given the public key (e, N) and cypher-text = cypher, use Pollard's rho algorithm to factorize N (finding p, q).
      * From that, derive phi(N) = (p-1)(q-1), and then the modular multiplicative inverse of e = d (mod N).
-     *
+     * This is then used to decrypt the cypher-text.
      */
     //
     fun bruteForce(e: Int, N: BigInteger, cypher: String, c: Context): String {
-        val maxFixedN =
-            BigInteger("1689243484681") // Used for our quick factorization for small values of N
-        var primeFactors = Pair(0, 0)
-        if (N <= maxFixedN) {
-            primeFactors = bruteForceSmallKey(N, c)
+//        val maxFixedN =
+//            BigInteger("1689243484681") // Used for our quick factorization for small values of N
+//        var primeFactors = Pair(0, 0)
+//        if (N <= maxFixedN) {
+//            primeFactors = bruteForceSmallKey(N, c)
+//        }
+
+        val primeFactors = pollardFactors(
+            N,
+            BigInteger("2")
+        ) // todo: if this fails? resort to search of txt file?
+
+        // Check we actually factorized N
+        if (primeFactors.first.multiply(primeFactors.second) != N) {
+            throw java.lang.ArithmeticException("Failed to factorize N and ran out of options")
         }
 
-        val phiN = BigInteger.valueOf(primeFactors.first.toLong() * primeFactors.second)
+        // Calculate phi(N)
+        val phiN = (primeFactors.first.minus(BigInteger.ONE)).multiply(
+            primeFactors.second.minus(
+                BigInteger.ONE
+            )
+        )
 
         // todo: use phi(N) to derive M.I. of e, then use that to decrypt message
 
         var plaintext = ""
 
         return plaintext
-    }
-
-    // todo: use quadratic sieve to bruteforce small primes N (?)
-    fun bruteForceSieve() {
-
     }
 
 }

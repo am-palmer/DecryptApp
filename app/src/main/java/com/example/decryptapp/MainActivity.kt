@@ -35,27 +35,27 @@ class MainActivity : AppCompatActivity() {
         //}
 
 
-        // todo: move all this out
-        val lordeLyrics =
-            "my friends and i weve cracked the code we count our dollars on the train to the party and everyone who knows us knows that were fine with this we didnt come from money z"
-        //val lordeLyricsFiltered = lordeLyrics.filter { !it.isWhitespace() }
-        val test = "abracadabra"
-        val caesarTest = "aol xbpjr mve qbtwlk vcly aol shgf kvn" // key is 7
-        val caesarTest2 = "Lwyg iu xkt sepd bera zkvaj hemqkn fqco" // key is 22
+        // todo: clean this whole thing up
+//        val lordeLyrics =
+//            "my friends and i weve cracked the code we count our dollars on the train to the party and everyone who knows us knows that were fine with this we didnt come from money z"
+//        //val lordeLyricsFiltered = lordeLyrics.filter { !it.isWhitespace() }
+//        val test = "abracadabra"
+//        val caesarTest = "aol xbpjr mve qbtwlk vcly aol shgf kvn" // key is 7
+//        val caesarTest2 = "Lwyg iu xkt sepd bera zkvaj hemqkn fqco" // key is 22
 
 
         //println("(Creation finished)")
         //println("Running indexOfCoincidence()")
         //indexOfCoincidence(lordeLyrics, 2)
         //decryptCaesar(caesarTest2, 22)
-        val caesar = CaesarCypher();
+        //val caesar = CaesarCypher();
         //caesar.bruteForce(caesarTest2, true, applicationContext)
 //        caesar.encrypt(
 //            "Pack my box with five dozen liquor jugs",
 //            22
 //        ) // Expected: lwyg iu xkt sepd bera zkvaj hemqkn fqco
 
-        val rsa = RSA()
+        //val rsa = RSA()
         //val result = rsa.extGCD(13, 11)
 //        Log.d(
 //            "Main",
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         //rsa.modInverse(13, 17)
         //rsa.modInverse(11, 21)
 
-        rsa.extGCD(13, 11) // Expected: gcd 1, MI 13 = -5, MI 11 = 6.
+        //rsa.extGCD(13, 11) // Expected: gcd 1, MI 13 = -5, MI 11 = 6.
 
         // p = 11
         // q = 13

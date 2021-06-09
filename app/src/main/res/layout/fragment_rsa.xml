@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textViewRSAPrivateKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Priv. key (phiN, d)"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextRSAModInvE"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/editTextRSAModInvE"
+        app:layout_constraintTop_toTopOf="@+id/editTextRSAModInvE" />
+
+    <EditText
+        android:id="@+id/editTextRSAModInvE"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ems="10"
+        android:hint="d (e^-1)"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/editTextRSAPhiN"
+        app:layout_constraintTop_toTopOf="@+id/editTextRSAPhiN" />
+
+    <EditText
+        android:id="@+id/editTextRSAPhiN"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="phi(N)"
+        android:inputType="number"
+        app:layout_constraintStart_toStartOf="@+id/editTextRSAP"
+        app:layout_constraintTop_toBottomOf="@+id/editTextMsgRSA" />
+
+    <EditText
+        android:id="@+id/editTextRSAQ"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ems="10"
+        android:hint="q"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/editTextRSAP"
+        app:layout_constraintTop_toTopOf="@+id/editTextRSAP" />
+
+    <EditText
+        android:id="@+id/editTextRSAP"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="p"
+        android:inputType="number"
+        app:layout_constraintStart_toStartOf="@+id/editTextRSAN"
+        app:layout_constraintTop_toBottomOf="@+id/editTextCypherRSA" />
+
+    <EditText
+        android:id="@+id/editTextMsgRSA"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="message"
+        android:inputType="textMultiLine"
+        app:layout_constraintHeight_max="300dp"
+        app:layout_constraintHeight_min="100dp"
+        app:layout_constraintStart_toStartOf="@+id/editTextCypherRSA"
+        app:layout_constraintTop_toBottomOf="@+id/editTextRSAP" />
+
+    <EditText
+        android:id="@+id/editTextCypherRSA"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="cyphertext"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="300dp"
+        app:layout_constraintHeight_min="100dp"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintStart_toStartOf="@+id/textViewDescriptionRSA"
+        app:layout_constraintTop_toBottomOf="@+id/editTextRSAN" />
+
+    <ImageButton
+        android:id="@+id/imageButtonDecryptRSA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="decrypt the cypher-text"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextCypherRSA"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editTextCypherRSA"
+        app:srcCompat="@drawable/ic_baseline_lock_open_24_purple" />
+
+    <ImageButton
+        android:id="@+id/imageButtonEncryptRSA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="encrypt the plaintext"
+
+        app:layout_constraintBottom_toBottomOf="@+id/editTextMsgRSA"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editTextMsgRSA"
+        app:srcCompat="@drawable/ic_baseline_lock_24_purple" />
+
+
+    <EditText
+        android:id="@+id/editTextRSAN"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="N"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/imageViewRSAKeyIcon"
+        app:layout_constraintTop_toBottomOf="@+id/textViewDescriptionRSA" />
+
+    <ImageView
+        android:id="@+id/imageViewRSAKeyIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextRSAN"
+        app:layout_constraintEnd_toEndOf="@+id/editTextMsgRSA"
+        app:layout_constraintHorizontal_bias="0.16"
+        app:layout_constraintStart_toStartOf="@+id/textViewDescriptionRSA"
+        app:layout_constraintTop_toTopOf="@+id/editTextRSAN"
+        app:srcCompat="@drawable/ic_baseline_vpn_key_24" />
+
+    <TextView
+        android:id="@+id/textViewDescriptionRSA"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="The RSA cryptosystem uses public-key cryptography to secure messages, relying for security on the difficulty of factoring the product of two large primes."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextRSAE"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ems="10"
+        android:hint="e"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/editTextRSAN"
+        app:layout_constraintTop_toTopOf="@+id/editTextRSAN" />
+
+    <TextView
+        android:id="@+id/textViewPublicKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="Pub. key (N, e)"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextRSAE"
+        app:layout_constraintStart_toEndOf="@+id/editTextRSAE"
+        app:layout_constraintTop_toTopOf="@+id/editTextRSAE" />
+
+    <TextView
+        android:id="@+id/textViewRSAFactorization"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Factors pq = N"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextRSAQ"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/editTextRSAQ"
+        app:layout_constraintTop_toTopOf="@+id/editTextRSAQ" />
+
+    <Button
+        android:id="@+id/buttonRSAClear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Clear"
+        app:layout_constraintEnd_toEndOf="@+id/textViewDescriptionRSA"
+        app:layout_constraintStart_toStartOf="@+id/textViewDescriptionRSA"
+        app:layout_constraintTop_toBottomOf="@+id/editTextRSAModInvE" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
