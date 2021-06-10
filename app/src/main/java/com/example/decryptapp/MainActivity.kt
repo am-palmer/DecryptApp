@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity() {
 
     private val tag = "Main"
 
+    // todo: get RSA ui working, test and make sure can solve the practice cyphers, clean up code, make sure everything is well commented
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -25,14 +27,6 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
-
-        // Give us a FAB if we need it.
-        //val fab: FloatingActionButton = findViewById(R.id.fab)
-
-        //fab.setOnClickListener { view ->
-        //    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-        //        .setAction("Action", null).show()
-        //}
 
 
         // todo: clean this whole thing up

@@ -6,14 +6,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class CaesarCypher {
-    //todo: coroutines, make this a coroutine so it doesn't eat the main thread
-    // todo: negative key? ie shifting to the left. test if it works
-
-    // todo: must support capitalized input! either directly or shift to lowercase first
 
     private val tag = "Caesar"
 
-    // todo: test
+    // todo: Support capitalized input
+
     // Encrypts the string using the given key. Supports letters and spaces
     fun encrypt(str: String, key: Int): String {
         var cipher = ""
@@ -36,18 +33,16 @@ class CaesarCypher {
 
     // Returns the decrypted string for a given key. Supports only letters and spaces
     fun decrypt(str: String, key: Int): String {
-        //Log.d("decryptCaesarKey", "started with key: ($key)")
         var output = ""
         for (char in str) {
             if (char.isLetter()) {
-                var newValue = (((char.toInt() + 26 - 96) - key) % 26)
+                var newValue = (((char.toLowerCase().toInt() + 26 - 96) - key) % 26)
 
                 if (newValue == 0) {
                     newValue = 'z'.toInt() - 96
                 }
                 val newChar = (newValue + 96).toChar()
                 output += newChar
-                //Log.d("decryptCaesar", "$char is shifted -$key spaces and becomes $newChar")
             } else {
                 output += char
             }
@@ -69,7 +64,7 @@ class CaesarCypher {
         smart: Boolean? = false,
         c: Context
     ): ArrayList<CaesarResult> {
-        // todo: optimize further
+        // todo: Split it into smaller functions
         var result = ArrayList<CaesarResult>()
 
         // Try all key values and add them to the result ArrayList
@@ -98,7 +93,6 @@ class CaesarCypher {
             }
             // Sort the result objects by wordCount
             result.sortWith { o1, o2 -> compareValues(o2.wordCount, o1.wordCount) }
-            // todo test
             Log.d("$tag.bruteForce", "Sorted list:")
             for (x in result) {
                 Log.d("$tag.bruteForce", "key=${x.key}, wordCount=${x.wordCount}: [${x.str}]")

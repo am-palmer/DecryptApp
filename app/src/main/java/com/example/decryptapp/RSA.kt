@@ -3,43 +3,12 @@ package com.example.decryptapp
 import android.content.Context
 import android.util.Log
 import java.math.BigInteger
+import kotlin.math.pow
 import kotlin.random.Random
 
 class RSA() {
 
-    // todo: if anything is seriously wrong, we might need BigIntegers instead of longs
-
     private val tag = "RSA"
-
-    // list of very small primes, useful for cracking (?) demo systems
-    private val verySmallPrimes = arrayOf(
-        2L,
-        3L,
-        5L,
-        7L,
-        11L,
-        13L,
-        17L,
-        19L,
-        23L,
-        29L,
-        31L,
-        37L,
-        41L,
-        43L,
-        47L,
-        53L,
-        59L,
-        61L,
-        67L,
-        71L,
-        73L,
-        79L,
-        83L,
-        89L,
-        97L,
-        101L
-    )
 
     // Returns triple (d, x, y) where d = gcd(a, b), x(a) + y(b) = d. I.e x, y, --> Multiplicative. inverse of a and b.
     fun extGCD(a: Int, b: Int): Triple<Int, Int, Int> {
@@ -47,28 +16,21 @@ class RSA() {
             return Triple(a, 1, 0)
         }
         val result = extGCD(b, (a % b))
-        val triple =
-            Triple(result.first, result.third, (result.second) - (a / b) * result.third)
-        Log.d(
-            "$tag.extGCD",
-            "Extended GCD of $a, $b: GCD=${triple.first}, ($a)^-1=${triple.second}, ($b)^-1=${triple.third}"
-        )
-        return triple
+        return Triple(result.first, result.third, (result.second) - (a / b) * result.third)
     }
 
-    // Generates a key
-    fun genKey(keysize: Int = 1024): Long {
+    // Generates a public key, by first generating two primes p, q, then N = pq, phi(N), and returning some e co-prime to phi(N)
+    fun genKey(keysize: Int = 1024): Pair<BigInteger, BigInteger> {
         // generate p, q
         val p = genLargePrime(keysize)
         val q = genLargePrime(keysize)
 
-        val n = p * q
-        val phiN = (p - 1) * (q - 1) // per fermat's little theorem
+        val phiN = (p - 1) * (q - 1) // Per Fermat's little theorem
 
         // find e, coprime with phiN && 1 < e <= phiN
         val start = pow(keysize - 1.toLong(), 2)
         val end = pow(keysize.toLong(), 2) - 1
-        var e = 0L
+        var e: Long
         while (true) {
             e = Random.nextLong(start, end)
             if (isCoPrime(e, phiN)) {
@@ -76,17 +38,14 @@ class RSA() {
             }
         }
 
-        return e
-
+        return Pair(e.toBigInteger(), (p*q).toBigInteger())
     }
 
     // Generates a random large prime number, with a size determined by keysize
-    // todo test this
     fun genLargePrime(keysize: Int): Long {
         while (true) {
             val start = pow(keysize - 1.toLong(), 2)
             val end = pow(keysize.toLong(), 2) - 1
-
             var x = Random.nextLong(start, end)
             if (isPrime(x)) {
                 return x
@@ -95,7 +54,9 @@ class RSA() {
     }
 
     fun pow(n: Long, exp: Int): Long {
-        return BigInteger.valueOf(n).pow(exp).toLong()
+        //return BigInteger.valueOf(n).pow(exp).toLong()
+        // Todo: test
+        return n.toDouble().pow(exp.toDouble()).toLong()
     }
 
     /**
@@ -130,21 +91,10 @@ class RSA() {
         return (gcdL(p, q) == 1L)
     }
 
-    // Boolean test for primality. Checking if it's NOT prime, defer to rabinMiller if uncertain
+    // Boolean test for primality, relying on the rabin miller primality test
     private fun isPrime(candidate: Long): Boolean {
         if (candidate <= 3) {
             return (candidate > 1)
-        }
-
-        if (candidate in verySmallPrimes) {
-            return true
-        }
-
-        // Division check
-        for (p in verySmallPrimes) {
-            if (candidate % p == 0L) {
-                return false
-            }
         }
 
         // find d, M.I. of e mod phiN, i.e. e*d equiv 1 (mod phiN)
@@ -160,12 +110,6 @@ class RSA() {
         return true
     }
 
-    // Euclidean algorithm for two ints a, b, returns gcd
-    private fun gcd(a: Int, b: Int): Int {
-        return if (b == 0) a
-        else gcd(b, a % b)
-    }
-
     // Euclidean algorithm for two longs a, b, returns gcd
     private fun gcdL(a: Long, b: Long): Long {
         return if (b == 0L) a
@@ -173,6 +117,7 @@ class RSA() {
     }
 
     // Returns modular multiplicative inverse x where (a)x congruent 1 (mod m). Won't work if the numbers aren't co-prime
+    // Todo: BigInteger so we have support for bigger numbers
     fun modInverse(a: Int, m: Int): Int {
         val result = extGCD(a, m)
         var x = result.second
@@ -181,12 +126,14 @@ class RSA() {
         return x
     }
 
-    // Fast modular exponentiation using the right-to-left binary method. See https://en.wikipedia.org/wiki/Modular_exponentiation#Right-to-left_binary_method
+    /**
+     * Fast modular exponentiation using the right-to-left binary method. See https://en.wikipedia.org/wiki/Modular_exponentiation#Right-to-left_binary_method
+     * Allows us to perform exponentiation for otherwise unfeasibly large numbers.
+     */
     private fun modExp(base: Long, exp: Long, m: Long): Long {
         if (m == 1L) {
             return 0
         }
-        //assert((m -1 ) * (m - 1) < Integer.MIN_VALUE)
         var result = 1L
         var base = base % m
         var exp = exp
@@ -202,35 +149,7 @@ class RSA() {
         return result
     }
 
-    // Iterate though the String msg, getting the ordinance value and raising to power e mod n
-    fun encrypt(e: Int, N: BigInteger, msg: String): String {
-        var cypher = ""
-        for (c in msg) {
-            cypher += modExp(c.toLong(), e.toLong(), N.toLong()).toString() + " "
-        }
-        Log.d("$tag.encrypt", "$msg encrypted to [$cypher]")
-        return cypher
-    }
-
-    // Decrypts a given string of numbers separated by whitespace into ascii plaintext
-    fun decrypt(d: Int, N: BigInteger, cypher: String): String {
-        var plaintext = ""
-
-        // Split on whitespace
-        val input = cypher.split(" ")
-        for (x in input) {
-            if (x.isNotEmpty()) {
-                val c = x.toInt()
-                plaintext += (modExp(c.toLong(), d.toLong(), N.toLong())).toChar()
-            }
-        }
-        Log.d("$tag.decrypt", "[$cypher] decrypted to \"$plaintext\"")
-        return plaintext
-    }
-
-    // SQRT for BigInts
-    // todo: optimize further
-    // todo: ceiling or floor?
+    // Square root function for BigInts
     private fun sqrt(N: BigInteger): BigInteger {
         if (N <= BigInteger.valueOf(0)) {
             throw ArithmeticException("Expected a positive number")
@@ -277,57 +196,19 @@ class RSA() {
     }
 
     /**
-     * Uses a list of the first 100K primes to find the factorization of N.
-     * Value of N passed should be smaller than the largest product of the 100,000th prime squared (1299709^2 = 1689243484681).
-     * TODO: This is just bad, don't use it
-     */
-    fun bruteForceSmallKey(N: BigInteger, c: Context): Pair<Int, Int> {
-        if (N > BigInteger("1689243484681")) {
-            throw java.lang.ArithmeticException("Expected a value of N <= 1689243484681.")
-        } else {
-            val primeList =
-                c.assets.open("100kPrimes.txt") // Text file with the first 100,000 primes, one per line
-            val reader = primeList.bufferedReader()
-            val primesString = reader.readLines()
-            var primeInts =
-                ArrayList<Int>() // Ints are fine here, largest is smaller than Integer.MAX_VALUE
-            for (str in primesString) {
-                // Todo -> read them as Ints first thing
-                primeInts.add(Integer.parseInt(str))
-            }
-
-            // Iterate through the list and try every combination...
-            for (x in primeInts) {
-                for (y in primeInts) {
-                    val candidate = BigInteger.valueOf(x.toLong() * y)
-                    if (candidate.equals(N)) return Pair(
-                        x,
-                        y
-                    ) // When we find a match, we have found the factors p,q of N
-                }
-            }
-        }
-        Log.wtf(
-            "$tag.bruteForceSmallKey",
-            "bruteForceSmallKey() failed to find candidate. Is N the product of two primes?",
-            IllegalStateException()
-        )
-        return Pair(0, 0) // Shouldn't ever happen
-    }
-
-    /**
      * Uses Pollard's rho algorithm to find the factors for smaller values of N. Returns Pair(p, q), or (0, 0) if it fails.
      * Details: https://en.wikipedia.org/wiki/Pollard%27s_rho_algorithm
      */
     fun pollardFactors(
         N: BigInteger,
-        x: BigInteger
+        x: BigInteger = BigInteger.valueOf(2L)
     ): Pair<BigInteger, BigInteger> {
 
-        var xVar = BigInteger("2")
-        var yVar = BigInteger("2")
+        var xVar = x
+        var yVar = x
         var factor = BigInteger.ONE
 
+        // Pollard's rho algorithm logic
         while (factor.equals(BigInteger.ONE)) {
             // "Tortoise" step
             xVar = rhoMod(xVar, N)
@@ -359,25 +240,53 @@ class RSA() {
         return (x.multiply(x.plus(BigInteger.ONE))).mod(mod)
     }
 
-    // todo: finish this and test it
+    // Iterate though the String msg, getting the ordinance value and raising to power e mod n. Returns a cypher of encrypted ordinance values
+    fun encryptText(e: Int, N: BigInteger, msg: String): String {
+        var cypher = ""
+        for (c in msg) {
+            cypher += modExp(c.toLong(), e.toLong(), N.toLong()).toString() + " "
+        }
+        Log.d("$tag.encrypt", "$msg encrypted to [$cypher]")
+        return cypher
+    }
+
+    // Decrypts a given string of ordinance values separated by whitespace into ascii plaintext
+    fun decryptText(d: Int, N: BigInteger, cypher: String): String {
+        var plaintext = ""
+
+        // Split on whitespace
+        val input = cypher.split(" ")
+        for (x in input) {
+            if (x.isNotEmpty()) {
+                val c = x.toInt()
+                plaintext += (modExp(c.toLong(), d.toLong(), N.toLong())).toChar()
+            }
+        }
+        Log.d("$tag.decrypt", "[$cypher] decrypted to \"$plaintext\"")
+        return plaintext
+    }
+
+    fun decrypt(d: Int, N: BigInteger, cypher: BigInteger): BigInteger {
+        return modExp(cypher.toLong(), d.toLong(), N.toLong()).toBigInteger()
+    }
+
+    fun encrypt(e: Int, N: BigInteger, msg: BigInteger): BigInteger {
+        return modExp(msg.toLong(), e.toLong(), N.toLong()).toBigInteger()
+    }
+
     /**
      * Given the public key (e, N) and cypher-text = cypher, use Pollard's rho algorithm to factorize N (finding p, q).
      * From that, derive phi(N) = (p-1)(q-1), and then the modular multiplicative inverse of e = d (mod N).
-     * This is then used to decrypt the cypher-text.
+     * This is then used to decrypt the cyphertext.
      */
     //
-    fun bruteForce(e: Int, N: BigInteger, cypher: String, c: Context): String {
-//        val maxFixedN =
-//            BigInteger("1689243484681") // Used for our quick factorization for small values of N
-//        var primeFactors = Pair(0, 0)
-//        if (N <= maxFixedN) {
-//            primeFactors = bruteForceSmallKey(N, c)
-//        }
+    fun bruteForce(e: Int, N: BigInteger, cypher: BigInteger): BigInteger {
 
+        // Use Pollard's rho algorithm to find the factors p, q of N
         val primeFactors = pollardFactors(
             N,
             BigInteger("2")
-        ) // todo: if this fails? resort to search of txt file?
+        )
 
         // Check we actually factorized N
         if (primeFactors.first.multiply(primeFactors.second) != N) {
@@ -391,11 +300,12 @@ class RSA() {
             )
         )
 
-        // todo: use phi(N) to derive M.I. of e, then use that to decrypt message
+        // Calculate modular multiplicative inverse of e (mod phiN)
+        // Todo: support for values bigger than Integer.MAX_VALUE
+        val d = modInverse(e, phiN.toInt())
 
-        var plaintext = ""
-
-        return plaintext
+        // Return the decrypted message.
+        return decrypt(d, N, cypher)
     }
 
 }
