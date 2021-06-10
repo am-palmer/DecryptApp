@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.decryptapp.CaesarCypher
+import com.example.decryptapp.CryptoUtil
 import com.example.decryptapp.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,17 +25,13 @@ class CaesarFragment : Fragment() {
 
     private lateinit var caesar: CaesarCypher
 
-    private lateinit var pageViewModel: PageViewModel
-
     private lateinit var messageTextView: EditText
     private lateinit var cypherTextView: EditText
     private lateinit var shiftKeyView: EditText
+    private lateinit var iocValueTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pageViewModel = ViewModelProvider(this).get(PageViewModel::class.java).apply {
-            setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
-        }
         caesar = CaesarCypher()
     }
 
@@ -45,6 +43,7 @@ class CaesarFragment : Fragment() {
         messageTextView = root.findViewById(R.id.editTextMessage)
         cypherTextView = root.findViewById(R.id.editTextCyphertext)
         shiftKeyView = root.findViewById(R.id.editTextShift)
+        iocValueTextView = root.findViewById(R.id.textViewIOCValue)
         val encryptButton: ImageButton = root.findViewById(R.id.imageButtonEncryptCaesar)
 
         encryptButton.setOnClickListener {
@@ -92,30 +91,18 @@ class CaesarFragment : Fragment() {
                     decryptInBackground(cypherTextView.text.toString(), requireContext())
                 }
 
-                // todo: coroutine
-                // Let's not even do this
-//                if (shiftKeyView.text.isNotEmpty()) {
-//                    // use the shift key provided
-//
-//                    val result = caesar.decrypt(
-//                        messageTextView.text.toString(),
-//                        Integer.parseInt(shiftKeyView.text.toString())
-//                    )
-//                    messageTextView.setText(result)
-//                    Toast.makeText(
-//                        requireContext(),
-//                        "Decrypted using shift=${shiftKeyView.text}",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//
-//                }
-                // bruteforce the shift value and message
-                // result[0] is our candidate solution. hopefully...
-
-
             }
         }
         return root
+    }
+
+    // Todo: move logic in here
+    private fun encryptButton() {
+
+    }
+
+    private fun decryptButton() {
+
     }
 
     private fun decryptInBackground(text: String, context: Context) {
@@ -129,6 +116,8 @@ class CaesarFragment : Fragment() {
         messageTextView.setText(plaintext)
         Toast.makeText(requireContext(), "Decrypted likely message", Toast.LENGTH_SHORT)
             .show()
+        iocValueTextView.text =
+            CryptoUtil().indexOfCoincidence(plaintext, 2).toString().subSequence(0, 5)
     }
 
     companion object {
@@ -136,7 +125,7 @@ class CaesarFragment : Fragment() {
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private const val ARG_SECTION_NUMBER = "section_number"
+        private const val ARG_SECTION_NUMBER = "1"
 
         /**
          * Returns a new instance of this fragment for the given section

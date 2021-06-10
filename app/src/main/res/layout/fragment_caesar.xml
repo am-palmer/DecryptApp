@@ -94,4 +94,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textViewIOCTag"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:text="I.O.C: "
+        app:layout_constraintStart_toEndOf="@+id/editTextMessage"
+        app:layout_constraintTop_toTopOf="@+id/editTextMessage" />
+
+    <TextView
+        android:id="@+id/textViewIOCValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="0.000"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewIOCTag"
+        app:layout_constraintStart_toEndOf="@+id/textViewIOCTag"
+        app:layout_constraintTop_toTopOf="@+id/textViewIOCTag" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

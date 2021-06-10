@@ -20,12 +20,10 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager)
     : FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment {
-        Log.d("sectionspager", "getItem() triggers with position $position")
         // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        //return PlaceholderFragment.newInstance(position + 1)
         return when (position){
             0 -> CaesarFragment.newInstance(position+1)
+            1 -> RSAFragment.newInstance(position+1)
             else -> PlaceholderFragment.newInstance(position+1)
         }
     }

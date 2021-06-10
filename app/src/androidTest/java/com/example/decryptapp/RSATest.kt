@@ -40,11 +40,11 @@ class RSATest : TestCase() {
     }
 
     fun testEncryptTextRSA() {
-        val p = 11
-        val q = 13
+        val p = 2239
+        val q = 4457
         val N = p * q
-        val e = 49 // co-prime to, and lesser than, phiN
-        val msg = "hello world"
+        val e = 647 // co-prime to, and lesser than, phiN
+        val msg = "uow crypto"
         val cypher = RSA().encryptText(e, BigInteger.valueOf(N.toLong()), msg)
         Log.d(
             tag,

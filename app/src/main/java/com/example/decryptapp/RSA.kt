@@ -1,9 +1,7 @@
 package com.example.decryptapp
 
-import android.content.Context
 import android.util.Log
 import java.math.BigInteger
-import kotlin.math.pow
 import kotlin.random.Random
 
 class RSA() {
@@ -27,7 +25,7 @@ class RSA() {
 
         val phiN = (p - 1) * (q - 1) // Per Fermat's little theorem
 
-        // find e, coprime with phiN && 1 < e <= phiN
+        // Find e, coprime with phiN && 1 < e <= phiN
         val start = pow(keysize - 1.toLong(), 2)
         val end = pow(keysize.toLong(), 2) - 1
         var e: Long
@@ -38,7 +36,7 @@ class RSA() {
             }
         }
 
-        return Pair(e.toBigInteger(), (p*q).toBigInteger())
+        return Pair(e.toBigInteger(), (p * q).toBigInteger())
     }
 
     // Generates a random large prime number, with a size determined by keysize
@@ -54,9 +52,8 @@ class RSA() {
     }
 
     fun pow(n: Long, exp: Int): Long {
-        //return BigInteger.valueOf(n).pow(exp).toLong()
-        // Todo: test
-        return n.toDouble().pow(exp.toDouble()).toLong()
+        return BigInteger.valueOf(n).pow(exp).toLong()
+        //return n.toDouble().pow(exp.toDouble()).toLong()
     }
 
     /**
@@ -117,7 +114,6 @@ class RSA() {
     }
 
     // Returns modular multiplicative inverse x where (a)x congruent 1 (mod m). Won't work if the numbers aren't co-prime
-    // Todo: BigInteger so we have support for bigger numbers
     fun modInverse(a: Int, m: Int): Int {
         val result = extGCD(a, m)
         var x = result.second
@@ -307,5 +303,51 @@ class RSA() {
         // Return the decrypted message.
         return decrypt(d, N, cypher)
     }
+
+    /**
+     * Identical to the above, but decrypts a string using decryptText(), and returns a result object of values to display in the Android app's UI
+     */
+    //
+    fun bruteForceText(e: Int, N: BigInteger, cypher: String): BruteForceResult {
+
+        // Use Pollard's rho algorithm to find the factors p, q of N
+        val primeFactors = pollardFactors(
+            N,
+            BigInteger("2")
+        )
+
+        // Check we actually factorized N
+        if (primeFactors.first.multiply(primeFactors.second) != N) {
+            throw java.lang.ArithmeticException("Failed to factorize N and ran out of options")
+        }
+
+        // Calculate phi(N)
+        val phiN = (primeFactors.first.minus(BigInteger.ONE)).multiply(
+            primeFactors.second.minus(
+                BigInteger.ONE
+            )
+        )
+
+        // Calculate modular multiplicative inverse of e (mod phiN)
+        val d = modInverse(e, phiN.toInt())
+
+        val plaintext = decryptText(d, N, cypher)
+        // Return the decrypted message.
+        return BruteForceResult(
+            plaintext,
+            primeFactors.first,
+            primeFactors.second,
+            phiN,
+            d.toBigInteger()
+        )
+    }
+
+    class BruteForceResult(
+        var msg: String,
+        var p: BigInteger,
+        var q: BigInteger,
+        var phiN: BigInteger,
+        var d: BigInteger
+    )
 
 }

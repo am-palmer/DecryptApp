@@ -7,15 +7,13 @@ class CryptoUtil {
 
     private final val tag = "CryptoUtil"
 
-    // todo: implement index of coincidence in the interface -> in the caesar portion, just so it is actually used somewhere.
     /**
      * Calculates the I.C. as a double for the given plain text string of English words (should contain no punctuation). Group size is 2 by default.
      * Characters are sorted into a hashMap (works well because of the limited range of possible values in 0..25
      * Then we iterate over the keys in the map and perform the I.O.C summation.
      */
     fun indexOfCoincidence(str: String, groupSize: Int? = 2): Double {
-        // Todo: convert uppercase to lowercase
-        val strFiltered = str.filter { !it.isWhitespace() } // Removes all whitespace
+        val strFiltered = str.filter { !it.isWhitespace() }.toLowerCase() // Removes all whitespace
         var result = 0.0
         val k = groupSize ?: 2 // Pairs by default
         val n = strFiltered.length
@@ -57,7 +55,6 @@ class CryptoUtil {
         val dictionary = reader.readLines()
         var count = 0
         val words = str.split(" ") // Split string into individual words based on spaces
-        // TODO Make a hashmap, or some other kind of hashing function it will be much faster
         for (word in words) {
             for (entry in dictionary) {
                 if (word == entry && word.length > 2) { // Ignore small words like 'it', 'a' as these can appear quite often even in random input
