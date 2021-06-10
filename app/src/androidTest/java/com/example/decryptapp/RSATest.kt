@@ -93,7 +93,6 @@ class RSATest : TestCase() {
         )
     }
 
-
     /**
      * Given the public key (e, N) and cypher-text, brute-force the decrypted message m by factorizing N to find p & q, and then using those to derive phi(N) and the modular inverse of e (i.e. the private key)
      */

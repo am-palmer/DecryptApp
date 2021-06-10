@@ -64,7 +64,6 @@ class CaesarCypher {
         smart: Boolean? = false,
         c: Context
     ): ArrayList<CaesarResult> {
-        // todo: Split it into smaller functions
         var result = ArrayList<CaesarResult>()
 
         // Try all key values and add them to the result ArrayList
